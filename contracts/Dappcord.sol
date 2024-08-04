@@ -7,7 +7,11 @@ contract Dappcord is ERC721 {
 
     uint256 public totalChannels;
 
+    uint256 public totalSupply;
+
     mapping(uint256 => Channel) public channels; 
+
+    mapping(uint256 => mapping(address => bool)) public  hasJoined; 
 
     struct Channel{
         uint256 id;
@@ -37,6 +41,26 @@ contract Dappcord is ERC721 {
         channels[totalChannels] = Channel(totalChannels, _name, _cost);
 
     }   
+
+
+    function mint(
+        uint256 _id
+    )
+    public payable
+    {
+        require(_id != 0, "Channel ID should not be 0");
+        require(_id <= totalChannels, "Incorrect Channel ID");
+        require(hasJoined[_id][msg.sender] == false, "User Already Joined");
+        require(msg.value >= channels[_id].cost, "Insufficient Amount");
+
+
+        hasJoined[_id][msg.sender] = true;
+        totalSupply++;
+
+        _safeMint(msg.sender, totalSupply);
+
+    }
+
 
     function getChannel(uint256 _id) public view returns (Channel memory ) {
         return channels[_id];

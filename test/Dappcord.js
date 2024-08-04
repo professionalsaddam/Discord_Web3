@@ -10,25 +10,27 @@ describe("Dappcord", function () {
     const NAME = "Dappcord"
     const SYMBOL = "DC"
 
-  describe('Deployment', () => { 
-
     let deployer,user;
 
-      beforeEach(async () => {
+    beforeEach(async () => {
 
-        [deployer,user] = await ethers.getSigners();
-       
-        // Deploy contract
-        const Dappcord = await ethers.getContractFactory("Dappcord")
-        dappcord = await Dappcord.deploy(NAME, SYMBOL)
-
-
-        //Create a Channel
-        const transaction = await dappcord.connect(deployer).createChannel("general",tokens(1));
-        await transaction.wait();
-    
+      [deployer,user] = await ethers.getSigners();
      
-      })
+      // Deploy contract
+      const Dappcord = await ethers.getContractFactory("Dappcord")
+      dappcord = await Dappcord.deploy(NAME, SYMBOL)
+
+
+      //Create a Channel
+      const transaction = await dappcord.connect(deployer).createChannel("general",tokens(1));
+      await transaction.wait();
+  
+   
+    })
+
+  describe('Deployment', () => { 
+
+
 
       it("Sets the name", async () => {
         const result = await dappcord.name()
@@ -65,6 +67,30 @@ describe("Dappcord", function () {
 
   });
 
+  describe("Joining Channels", () => {
+    const ID = 1
+    const AMOUNT = tokens(1);
+
+    beforeEach(async () => {
+      const transaction = await dappcord.connect(user).mint(ID, { value: AMOUNT })
+      await transaction.wait()
+    })
+
+    it('Joins the user', async () => {
+      const result = await dappcord.hasJoined(ID, user.address)
+      expect(result).to.be.equal(true)
+    })
+
+    it('Increases total supply', async () => {
+      const result = await dappcord.totalSupply()
+      expect(result).to.be.equal(ID)
+    })
+
+    it('Updates the contract balance', async () => {
+      const result = await ethers.provider.getBalance(dappcord.address)
+      expect(result).to.be.equal(AMOUNT)
+    })
+  })
 
 });
   
