@@ -25,6 +25,9 @@ function App() {
 
   const [dappcord, setDappcord] = useState(null);
 
+  const [channels,setChannels] = useState([]);
+  const [currentChannel,setCurrentChannel] = useState(null);
+
   const loadBlockchain = async () => {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -37,6 +40,19 @@ function App() {
     setDappcord(dappcord);
 
     console.log("Dappcord Contract",dappcord.address);
+
+    const totalChannels = await dappcord.totalChannels();
+    const channels = []
+
+    for (var i = 1; i <= totalChannels; i++) {
+      const channel = await dappcord.getChannel(i)
+      channels.push(channel)
+    }
+
+    setChannels(channels)
+
+    console.log(channels)
+
 
     window.ethereum.on("accountsChanged", () => {
       window.location.reload();
@@ -61,7 +77,15 @@ function App() {
       <main>
 
         <Servers />
-        <Channels />
+        <Channels
+
+        provider={provider}
+        account={account}
+        dappcord={dappcord}
+        channels={channels}
+        currentChannel={currentChannel}
+        setCurrentChannel={setCurrentChannel}
+        />
         <Messages />
 
       </main>
