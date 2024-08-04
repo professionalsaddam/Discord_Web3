@@ -1,4 +1,5 @@
 const { expect } = require("chai")
+const { ethers } = require("hardhat")
 
 const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), 'ether')
@@ -11,7 +12,11 @@ describe("Dappcord", function () {
 
   describe('Deployment', () => { 
 
+    let deployer,user;
+
       beforeEach(async () => {
+
+        [deployer,user] = await ethers.getSigners();
        
         // Deploy contract
         const Dappcord = await ethers.getContractFactory("Dappcord")
@@ -28,6 +33,11 @@ describe("Dappcord", function () {
       it("Sets the symbol", async () => {
         const result = await dappcord.symbol()
         expect(result).to.equal(SYMBOL)
+      })
+
+      it("Sets the Owner", async () => {
+        const result = await dappcord.owner()
+        expect(result).to.equal(deployer.address)
       })
 
    })
