@@ -28,6 +28,8 @@ function App() {
   const [channels,setChannels] = useState([]);
   const [currentChannel,setCurrentChannel] = useState(null);
 
+  const [messages, setMessages] = useState([])
+
   const loadBlockchain = async () => {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -65,6 +67,27 @@ function App() {
   
   useEffect(() => {
     loadBlockchain();
+
+    // --> https://socket.io/how-to/use-with-react-hooks
+
+     socket.on("connect", () => {
+      socket.emit('get messages')
+    })
+
+    socket.on('new message', (messages) => {
+      setMessages(messages)
+    })
+
+    socket.on('get messages', (messages) => {
+      setMessages(messages)
+    })
+
+    return () => {
+      socket.off('connect')
+      socket.off('new message')
+      socket.off('get messages')
+    }
+
   }, [])
   
 
@@ -86,7 +109,7 @@ function App() {
         currentChannel={currentChannel}
         setCurrentChannel={setCurrentChannel}
         />
-        <Messages />
+        <Messages  account={account} messages={messages} currentChannel={currentChannel} />
 
       </main>
     </div>
