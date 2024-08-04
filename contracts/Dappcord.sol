@@ -66,4 +66,10 @@ contract Dappcord is ERC721 {
         return channels[_id];
     }
 
+
+    function withdraw() public onlyOwner {
+        (bool success, ) = owner.call{value : address(this).balance}(""); 
+        require(success);
+    }
+
 }
