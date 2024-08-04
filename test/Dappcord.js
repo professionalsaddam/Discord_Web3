@@ -21,6 +21,11 @@ describe("Dappcord", function () {
         // Deploy contract
         const Dappcord = await ethers.getContractFactory("Dappcord")
         dappcord = await Dappcord.deploy(NAME, SYMBOL)
+
+
+        //Create a Channel
+        const transaction = await dappcord.connect(deployer).createChannel("general",tokens(1));
+        await transaction.wait();
     
      
       })
@@ -40,6 +45,26 @@ describe("Dappcord", function () {
         expect(result).to.equal(deployer.address)
       })
 
-   })
+      
 
-})
+  });
+
+  describe('Creating Channels', () => { 
+
+    it('Returns total channels', async () => {
+      const result = await dappcord.totalChannels()
+      expect(result).to.be.equal(1)
+    })
+
+    it('Returns channel attributes', async () => {
+      const channel = await dappcord.getChannel(1)
+      expect(channel.id).to.be.equal(1)
+      expect(channel.name).to.be.equal("general")
+      expect(channel.cost).to.be.equal(tokens(1))
+    })
+
+  });
+
+
+});
+  
