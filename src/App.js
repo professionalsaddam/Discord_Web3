@@ -19,7 +19,38 @@ const socket = io('ws://localhost:3030');
 
 function App() {
 
+  const [provider, setProvider] = useState(null)
+  const [network, setNetwork] = useState(null)
   const [account, setAccount] = useState(null)
+
+  const [dappcord, setDappcord] = useState(null);
+
+  const loadBlockchain = async () => {
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    setProvider(provider);
+
+    const network = await provider.getNetwork()
+    setNetwork(network)
+
+    const dappcord = new ethers.Contract( config[network.chainId].Dappcord.address, Dappcord, provider);
+    setDappcord(dappcord);
+
+    console.log("Dappcord Contract",dappcord.address);
+
+    window.ethereum.on("accountsChanged", () => {
+      window.location.reload();
+    })
+
+   
+
+
+  }
+  
+  useEffect(() => {
+    loadBlockchain();
+  }, [])
+  
 
   return (
     <div>
